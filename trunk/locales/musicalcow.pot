@@ -1,0 +1,210 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2006-05-24 17:42+CEST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: ../lyricistcow.pyw:94
+msgid "Artist"
+msgstr ""
+
+#: ../lyricistcow.pyw:95
+msgid "Song title"
+msgstr ""
+
+#: ../lyricistcow.pyw:96
+msgid "Search"
+msgstr ""
+
+#: ../lyricistcow.pyw:113 ../lyricistcow.pyw:346 ../lyricistcow.pyw:361
+msgid "Lyrics"
+msgstr ""
+
+#: ../lyricistcow.pyw:115 ../lyricistcow.pyw:349 ../lyricistcow.pyw:362
+msgid "Untitled %s"
+msgstr ""
+
+#: ../lyricistcow.pyw:133
+msgid "Open new &tab"
+msgstr ""
+
+#: ../lyricistcow.pyw:134
+msgid "&Close tab"
+msgstr ""
+
+#: ../lyricistcow.pyw:136
+msgid "&Save as"
+msgstr ""
+
+#: ../lyricistcow.pyw:137
+msgid "&Auto save"
+msgstr ""
+
+#: ../lyricistcow.pyw:139
+msgid "&Print"
+msgstr ""
+
+#: ../lyricistcow.pyw:141
+msgid "E&xit"
+msgstr ""
+
+#: ../lyricistcow.pyw:144
+msgid "&Preferences"
+msgstr ""
+
+#: ../lyricistcow.pyw:147
+msgid "&Help"
+msgstr ""
+
+#: ../lyricistcow.pyw:149
+msgid "&About lyricistCow"
+msgstr ""
+
+#: ../lyricistcow.pyw:151
+msgid "&File"
+msgstr ""
+
+#: ../lyricistcow.pyw:152
+msgid "&Edit"
+msgstr ""
+
+#: ../lyricistcow.pyw:157
+msgid "Do you really want to quit lyricistCow"
+msgstr ""
+
+#: ../lyricistcow.pyw:223
+msgid "Preferences"
+msgstr ""
+
+#: ../lyricistcow.pyw:230
+msgid "About lyricistCow"
+msgstr ""
+
+#: ../lyricistcow.pyw:237
+msgid "Fill the fields 'artist' and 'song title'.                        You will receive a list of song"
+msgstr ""
+
+#: ../lyricistcow.pyw:239
+msgid "Help"
+msgstr ""
+
+#: ../lyricistcow.pyw:255 ../lyricistcow.pyw:281 ../lyricistcow.pyw:323
+#: ../lyricistcow.pyw:384 ../lyricistcow.pyw:394
+msgid "Error"
+msgstr ""
+
+#: ../lyricistcow.pyw:256
+msgid "Fill required fields"
+msgstr ""
+
+#: ../lyricistcow.pyw:263
+msgid "Searching"
+msgstr ""
+
+#: ../lyricistcow.pyw:270
+msgid "Seeking '%s' from %s ..."
+msgstr ""
+
+#: ../lyricistcow.pyw:288 ../lyricistcow.pyw:289
+msgid "No correspondence found"
+msgstr ""
+
+#: ../lyricistcow.pyw:304
+msgid "Make your choice"
+msgstr ""
+
+#: ../lyricistcow.pyw:305
+msgid "Results"
+msgstr ""
+
+#: ../lyricistcow.pyw:317
+msgid "Downloading '%s' ..."
+msgstr ""
+
+#: ../lyricistcow.pyw:384
+msgid "Nothing to save"
+msgstr ""
+
+#: ../lyricistcow.pyw:394
+msgid "Saving failed"
+msgstr ""
+
+#: ../lyricistcow.pyw:417
+msgid "Output directory"
+msgstr ""
+
+#: ../lyricistcow.pyw:418
+msgid "File model"
+msgstr ""
+
+#: ../lyricistcow.pyw:419
+msgid "Example"
+msgstr ""
+
+#: ../lyricistcow.pyw:423
+msgid "Browse"
+msgstr ""
+
+#: ../lyricistcow.pyw:430
+msgid "Ok"
+msgstr ""
+
+#: ../lyricistcow.pyw:431
+msgid "Abort"
+msgstr ""
+
+#: ../lyricistcow.pyw:434
+msgid "Global preferences"
+msgstr ""
+
+#: ../lyricistcow.pyw:481
+msgid "lyricistCow - A simple lyrics viewer"
+msgstr ""
+
+#: ../lyricistcow.pyw:484
+msgid "Lyrics provided by %s"
+msgstr ""
+
+#: ../lyricistcow.pyw:489
+msgid "About"
+msgstr ""
+
+#: ../lyricistcow.pyw:498
+msgid "License"
+msgstr ""
+
+#: ../lyricistcow.pyw:503
+msgid "System: %s"
+msgstr ""
+
+#: ../lyricistcow.pyw:509
+msgid "Informations"
+msgstr ""
+
+#: ../lyricistcow.pyw:515
+msgid "Close"
+msgstr ""
+
+#: ../searchlyrics.py:35
+msgid "Cannot reach host"
+msgstr ""
+
+#: ../searchlyrics.py:72
+msgid "Unknow Album"
+msgstr ""
+
+#: ../searchlyrics.py:81
+msgid "Attempt to download lyrics failed"
+msgstr ""
+
