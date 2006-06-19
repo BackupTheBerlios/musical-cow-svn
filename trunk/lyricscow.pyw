@@ -18,8 +18,6 @@
 #
 # $Id$
 
-__version__ = '0.2.0529'
-
 import sys
 import os
 import locale
@@ -29,21 +27,14 @@ import ConfigParser
 from wax import *
 from wax.tools.choicedialog import ChoiceDialog
 from wax.tools.progressdialog import ProgressDialog
-import wx.html
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3, USLT
 
+import const
 from searchlyrics import SearchLyrics
 from cowabout import AboutDialog
 from cowpreferences import PreferencesDialog
-
-def GenerateHTML(header, content):
-    """ Generate HTML code. """
-    
-    HTML = "<h3 align=\"center\">%s</h3><br><br>" \
-           "<span style=\"font-size: 10pt\">%s</span>" % (header, content)
-    
-    return HTML.encode('latin-1', 'replace').replace('\n', '<br>')
+from cowprinter import Printer
 
 def GenerateFilename(*args, **kwds):
     """ Generate filename from a model. """
@@ -59,17 +50,7 @@ def GenerateFilename(*args, **kwds):
     
     return filename[-1]
 
-class Printer(wx.html.HtmlEasyPrinting):
-    """ Prints HTML code. """
-    
-    def __init__(self, parent):
-        wx.html.HtmlEasyPrinting.__init__(self)
-        self.parent = parent
-        
-    def Print(self, text, linenumbers=1):
-        self.PrintText(text)
-
-class LyricsCow(Frame):
+class MusicalCow(Frame):
     """ Main window with menu, status bar and notebook (tabs) for lyrics. """
     
     def Body(self):
@@ -290,7 +271,8 @@ class LyricsCow(Frame):
     def OnQuit(self, event=None):
         """ Quit application """
         quitDialog = MessageDialog(self,
-                               text=_("Do you really want to quit lyricistCow"),
+                               text=_("Do you really want to quit The Musical" \
+                                      "Cow"),
                                icon = "question", yes_no = 1)
         if quitDialog.ShowModal() == 'yes':
             self.Close(True)
@@ -339,14 +321,9 @@ class LyricsCow(Frame):
     
     def OnPrint(self, event=None):
         """ Print lyrics. """
-        
-        self.lyricsHTML = GenerateHTML("%s - %s" %
-                                       (self.result[self.cTab]['artist'],
-                                        self.result[self.cTab]['song']),
-                                       self.result[self.cTab]['lyrics'])
-        
-        self.printer = Printer(self)
-        self.printer.Print(self.lyricsHTML)
+        printer = Printer(self.result[self.cTab]['artist'],
+                          self.result[self.cTab]['song'],
+                          self.result[self.cTab]['lyrics'])
     
     def OnPreferences(self, event=None):
         """ Preferences dialog. """
@@ -354,6 +331,7 @@ class LyricsCow(Frame):
         prefDialog = PreferencesDialog(self, _("Preferences"))
         prefDialog.ShowModal()
         prefDialog.Destroy()
+        #LoadConfig()
     
     def OnAbout(self, event=None):
         """ About dialog. """
@@ -461,13 +439,16 @@ class LyricsCow(Frame):
                 return
             
             self.nb.tab[self.cTab].lyricsText.Clear()
+            
+            for lines in self.lyrics['lyrics']['lyrics'].split('\n'):
+                self.nb.tab[self.cTab].lyricsText.InsertText(0, lines.strip())
+                
             self.nb.tab[self.cTab].lyricsText.InsertText(0,
-                                                self.lyrics['lyrics']['lyrics'])
-            self.nb.tab[self.cTab].lyricsText.InsertText(0, 
                  "[%s - %s]\r\r" % (self.lyrics['artist'], self.lyrics['song']))
+                
             self.nb.SetPageText(self.cTab, "%s - %s" % (self.lyrics['artist'],
                                                         self.lyrics['song']))
-            self.statusBar[1] = "%s - %s" % (self.lyrics['artist'], 
+            self.statusBar[1] = "%s - %s" % (self.lyrics['artist'],
                                              self.lyrics['song'])
             self.usedTab[self.cTab] = True
             self.result[self.cTab] = {'artist': self.lyrics['artist'],
@@ -512,11 +493,12 @@ class LyricsCow(Frame):
         added = 0
         self.statusBar[2] = _("Tags added: %s") % 0
         
-        for i in range(self.mTags):
+        for file, status in self.fileList:
             lyrics = {}
             songSelected = {}
+            text = ""
             
-            audio = ID3(self.fileList[i][0])
+            audio = ID3(file)
             artist = unicode(audio.getall('TPE1')[0])
             song = unicode(audio.getall('TIT2')[0])
             
@@ -530,16 +512,15 @@ class LyricsCow(Frame):
                 self.output.InsertText(0, _("ERROR: ") % result['error'])
                 continue
             
+            # How many results ?
             if len(result['songlist'].values()) == 0:
                 self.output.InsertText(0, _("No result for %s - %s\r") %
                                           (artist, song))
                 continue
                 
-            if len(result['songlist'].values()) == 1:
-                print "1 resultat"
+            elif len(result['songlist'].values()) == 1:
                 songSelected = result['songlist'][0]
-                
-            # More than one choice => Choice dialog
+            
             else:
                 choices = []
                 
@@ -554,19 +535,13 @@ class LyricsCow(Frame):
                     songSelected = result['songlist'][choiceDialog.choice]
                 
                 choiceDialog.Destroy()
-                        
-            if len(songSelected) != 3:
-                print "sel: %s" % len(songSelected)
-                self.output.InsertText(0, _("No result for %s - %s\r") %
-                                          (artist, song))
-                continue
             
             # Download lyrics
             lyrics['artist'] = songSelected[0]
             lyrics['song'] = songSelected[1]
             lyrics['hid'] = songSelected[2]
             lyrics['lyrics'] = search.ShowLyrics(lyrics['hid'])
-                     
+            
             # Detect errors
             if lyrics['lyrics'].has_key('error'):
                 self.output.InsertText(0,
@@ -574,22 +549,47 @@ class LyricsCow(Frame):
                 self.output.InsertText(0,
                    _("Lyrics found but NOT added for %s - %s") % (artist, song))
                 continue
-                
+            
+            
+            # Remove whitespace
+            for lines in lyrics['lyrics']['lyrics'].split('\n'):
+                text += "%s\r\n" % lines.strip()
+            
+            # Try to save file
             try:
-                audio.add(USLT(encoding=3, desc='', lang='eng',
-                               text=lyrics['lyrics']['lyrics']))
+                audio.add(USLT(encoding=3, desc='', lang='eng', text=text))
                 audio.save()
             
             except Exception,err:
                 self.output.InsertText(0,
-                   _("Lyrics found but NOT added for %s - %s") % (artist, song))
+                  _("Lyrics found but NOT added for %s - %s") % (artist, song))
                 continue
             
+            # Verify if the file is really tagged
+            try:
+                audioTag = MP3(file)
+            
+            except Exception, err:
+                self.output.InsertText(0, _("Error (while scanning (%s): %s\r")
+                                          % (file, err))
+                continue
+            
+            for items in audioTag:
+                if items[:4] == 'USLT':
+                    if len(str(audio.getall(items)[0])) >= 100:
+                        status = True
+            
+            # Not tagged !
+            if not status:
+                self.output.InsertText(0,
+                  _("Lyrics found but NOT added for %s - %s") % (artist, song))
+                continue
+         
+            # Everything's allright
             self.output.InsertText(0, _("Lyrics found and added for %s - %s\r")
                                       % (artist, song))
             added += 1
             self.statusBar[2] = _("Tags added: %s") % added
-            lyrics['lyrics']['lyrics'] = None
 
             if not cancel:
                 break
@@ -636,23 +636,20 @@ class LyricsCow(Frame):
                         if items[:4] == 'USLT':
                             if len(str(ID3(fullpath).getall(items)[0])) >= 100:
                                 status = items
+                                break
                                 
-                    if status is None:
+                    if not status:
+                        fileList[missed] = [fullpath, False]
                         missed += 1
                         self.statusBar[1] = _("Missed tags: %d") % missed
-                        
-                    fileList[id] = [fullpath, status]
                     id += 1
         
         return (fileList, id, missed)
-        
-if __name__ == "__main__":
+
+def LoadConfig():
+    """ Load config file or create one. """
     
-    # Log error
-    errorFile = open('error.log', 'w')
-    sys.stderr = errorFile
     
-    # Configuration file
     try:
         configFile = os.path.join(os.path.abspath('musicalcow.cfg'))
         config = ConfigParser.ConfigParser()
@@ -672,6 +669,14 @@ directory = ~/
         config = ConfigParser.ConfigParser()
         config.readfp(open(configFile, 'r'))
         
+if __name__ == "__main__":
+    
+    # Log error
+    errorFile = open('error.log', 'w')
+    sys.stderr = errorFile
+    
+    LoadConfig()
+        
     # Gettext init
     gettext.bindtextdomain('musicalcow')
     locale.setlocale(locale.LC_ALL, '')
@@ -679,5 +684,5 @@ directory = ~/
     gettext.install('musicalcow', os.path.abspath('locales'), unicode=1)
     
     # Creates windows
-    lyricsCow = Application(LyricsCow, title="The Lyrics Cow")
-    lyricsCow.Run()
+    MusicalCow = Application(MusicalCow, title="The Musical Cow")
+    MusicalCow.Run()
