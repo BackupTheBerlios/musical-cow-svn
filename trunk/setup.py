@@ -15,6 +15,8 @@ import psyco
 psyco.log()
 psyco.full()
 
+import const
+
 # If run without args, build executables, in quiet mode.
 if len(sys.argv) == 1:
     sys.argv.append('py2exe')
@@ -24,10 +26,10 @@ class Target:
     def __init__(self, **kw):
         self.__dict__.update(kw)
         # for the versioninfo resources
-        self.version = '0.2.0529'
+        self.version = const.VERSION
         self.company_name = 'ZeVlad'
         self.copyright = '2006 - Vladimir Svoboda'
-        self.name = 'The Lyrics Cow'
+        self.name = 'The Musical Cow'
 
 ################################################################
 # A program using wxPython

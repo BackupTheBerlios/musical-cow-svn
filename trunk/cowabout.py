@@ -22,7 +22,7 @@ class AboutDialog(CustomDialog):
         import platform
         
         # Create dialog
-        programName = Label(self, "The Musical Cow %s" % const.__version__)
+        programName = Label(self, "The Musical Cow %s" % const.VERSION)
         programName.SetFont(('Verdana', 14))
         nb = NoteBook(self, size = (400,300))
         

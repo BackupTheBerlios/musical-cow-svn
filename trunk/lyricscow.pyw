@@ -242,8 +242,8 @@ class MusicalCow(Frame):
         
         gPanel = HorizontalPanel(podCow)
         
-        self.musicPath = TextBox(gPanel,
-                                 Value=config.get('MusicRoot', 'directory'))
+        self.musicPath = TextBox(gPanel, Value=os.path.expanduser(config.get(
+                                         'MusicRoot', 'directory')))
         
         gPanel.AddComponent(Label(gPanel, _("Music Directory:"), align='right'),
                                   border=8)
@@ -331,7 +331,7 @@ class MusicalCow(Frame):
         prefDialog = PreferencesDialog(self, _("Preferences"))
         prefDialog.ShowModal()
         prefDialog.Destroy()
-        #LoadConfig()
+        config = LoadConfig()
     
     def OnAbout(self, event=None):
         """ About dialog. """
@@ -493,34 +493,41 @@ class MusicalCow(Frame):
         added = 0
         self.statusBar[2] = _("Tags added: %s") % 0
         
-        for file, status in self.fileList:
+        for file in self.fileList:
+            print file
+        
+        for file, status in self.fileList.values():
+            print "%s - %s" % (file, status)
             lyrics = {}
             songSelected = {}
             text = ""
-            
+            print "0"
             audio = ID3(file)
             artist = unicode(audio.getall('TPE1')[0])
             song = unicode(audio.getall('TIT2')[0])
-            
-            cancel = dlg.Update(i, _("Adding lyrics to %s - %s") %
+            print "2"
+            cancel = dlg.Update(added, _("Adding lyrics to %s - %s") %
                                    (artist, song))
             
+            print "1"
             search = SearchLyrics()
+            print "2"
             result = search.SearchLyrics(artist, song)
+            
+            print "yep"
             
             if result.has_key('error'):
                 self.output.InsertText(0, _("ERROR: ") % result['error'])
                 continue
+            print "co"
             
             # How many results ?
             if len(result['songlist'].values()) == 0:
                 self.output.InsertText(0, _("No result for %s - %s\r") %
                                           (artist, song))
                 continue
-                
             elif len(result['songlist'].values()) == 1:
                 songSelected = result['songlist'][0]
-            
             else:
                 choices = []
                 
@@ -533,9 +540,13 @@ class MusicalCow(Frame):
                                             size=(300, 200))
                 if choiceDialog.ShowModal() == 'ok':
                     songSelected = result['songlist'][choiceDialog.choice]
+                else:
+                    self.output.InsertText(0, _("No result for %s - %s\r") %
+                                          (artist, song))
+                    continue
                 
                 choiceDialog.Destroy()
-            
+            print "enc"
             # Download lyrics
             lyrics['artist'] = songSelected[0]
             lyrics['song'] = songSelected[1]
@@ -547,9 +558,9 @@ class MusicalCow(Frame):
                 self.output.InsertText(0,
                                        _("ERROR: ") % lyrics['lyrics']['error'])
                 self.output.InsertText(0,
-                   _("Lyrics found but NOT added for %s - %s") % (artist, song))
+                   _("Lyrics found but NOT added for %s - %s\r") % (artist, song))
                 continue
-            
+            print "ore"
             
             # Remove whitespace
             for lines in lyrics['lyrics']['lyrics'].split('\n'):
@@ -562,7 +573,7 @@ class MusicalCow(Frame):
             
             except Exception,err:
                 self.output.InsertText(0,
-                  _("Lyrics found but NOT added for %s - %s") % (artist, song))
+                  _("Lyrics found but NOT added for %s - %s\r") % (artist, song))
                 continue
             
             # Verify if the file is really tagged
@@ -582,7 +593,7 @@ class MusicalCow(Frame):
             # Not tagged !
             if not status:
                 self.output.InsertText(0,
-                  _("Lyrics found but NOT added for %s - %s") % (artist, song))
+                  _("Lyrics found but NOT added for %s - %s\r") % (artist, song))
                 continue
          
             # Everything's allright
@@ -654,6 +665,8 @@ def LoadConfig():
         configFile = os.path.join(os.path.abspath('musicalcow.cfg'))
         config = ConfigParser.ConfigParser()
         config.readfp(open(configFile, 'r'))
+        return config
+    
     except Exception, err:
         configFile = open(os.path.join(os.path.abspath('musicalcow.cfg')), 'w')
         configFile.write("""
@@ -668,6 +681,7 @@ directory = ~/
         configFile = os.path.join(os.path.abspath('musicalcow.cfg'))
         config = ConfigParser.ConfigParser()
         config.readfp(open(configFile, 'r'))
+        return config
         
 if __name__ == "__main__":
     
@@ -675,8 +689,8 @@ if __name__ == "__main__":
     errorFile = open('error.log', 'w')
     sys.stderr = errorFile
     
-    LoadConfig()
-        
+    config = LoadConfig()
+    
     # Gettext init
     gettext.bindtextdomain('musicalcow')
     locale.setlocale(locale.LC_ALL, '')
