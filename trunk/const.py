@@ -11,4 +11,4 @@
 # $Id$
 
 AUTHOR = "Svoboda Vladimir <ze.vlad@gmail.com>"
-VERSION = "0.2 (19 June 2006)"
+VERSION = "0.2 (22 August 2006)"

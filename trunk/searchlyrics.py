@@ -10,35 +10,59 @@
 #
 # $Id$
 
-import sys
+import sys, types
 import urllib
 from xml.dom import minidom
 
 class SearchLyrics:
     """ Search lyrics from artist and song title. """
-        
+       
     def SearchLyrics(self, artist, song):
+        result = self.LeosLyrics(artist, song)
+        print types(result)
+        return result
+    
+    def Lyrc(self, artist, song):
+        result = {}
+        searchHost = 'http://201.216.192.44/xml/?artist=%s&songname=%s' % (
+                      urllib.quote(artist.encode('latin-1')),
+                      urllib.quote(song.encode('latin-1')))
+        
+        try:
+            resultSock = urllib.urlopen(searchHost)
+            resultDoc = minidom.parse(resultSock).documentElement
+            resultSock.close()
+        
+        except Exception, err:
+            sys.stderr.write(err)
+            result["error"] = _("Cannot reach host")
+            return
+        
+    def LeosLyrics(self, artist, song):
         """ Get list of songs from leoslyrics.com """
         
         result = {}
-        
+        searchHost = "http://api.leoslyrics.com/api_search.php?auth="
+        searchHost += "TheMusicalCow&artist=%s&songtitle=%s" % (
+                      urllib.quote(artist.encode('utf-8')),
+                      urllib.quote(song.encode('utf-8')))
         # Open a socket and analyse XML file to see results
-        try:
-            
-            resultSock = urllib.urlopen(
-             'http://api.leoslyrics.com/api_search.php?auth=TheMusicalCow'
-             '&artist=%s&songtitle=%s' % (urllib.quote(artist.encode('utf-8')),
-                                          urllib.quote(song.encode('utf-8'))))
+        """try:
+            resultSock = urllib.urlopen(searchHost)
             resultDoc = minidom.parse(resultSock).documentElement
             resultSock.close()
-            resultCode = resultDoc.getElementsByTagName('response')[0].getAttribute('code')
         
         except Exception, err:
-            sys.stderr.write("Cannot reach host: %s" % err)
-            #result["error"] = _("Cannot reach host")
-            resultCode = 1
-        
-        if resultCode == '0':
+            sys.stderr.write(err)
+            result["error"] = _("Cannot reach host")
+            return"""
+        resultSock = urllib.urlopen(searchHost)
+        resultDoc = minidom.parse(resultSock).documentElement
+        resultSock.close()
+            
+        print "si"
+        if resultDoc.getElementsByTagName('response')[0].getAttribute('code') == '0':
+            print "nan"
             # Create list from result
             matches = resultDoc.getElementsByTagName('result')[:50]
             hid = map(lambda x: x.getAttribute('hid'), matches)
@@ -56,7 +80,8 @@ class SearchLyrics:
                 songList[i] = list
                 i += 1
                 
-            result["songlist"] = songList
+            result['songlist'] = songList
+            print result
             resultDoc.unlink()
             
         return result
@@ -69,7 +94,7 @@ class SearchLyrics:
         try:
             lyricsSock = urllib.urlopen(
              'http://api.leoslyrics.com/api_lyrics.php?auth=TheMusicalCow'
-             '&hid=%s' % ( urllib.quote(hid.encode('utf-8'))))
+             '&hid=%s' % (urllib.quote(hid.encode('utf-8'))))
             lyricsDoc = minidom.parse(lyricsSock).documentElement
             lyricsSock.close()
             

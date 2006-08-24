@@ -132,7 +132,7 @@ class MusicalCow(Frame):
         self.LyricsCowMenu()
         self.Repack()
         
-        self.SetSizeX(self.GetSizeX()+1)
+        self.SetSizeX(self.GetSizeX()-1)
     
     def CreatePodCow(self, event=None):
         """ Switch to library tagging mode. """
@@ -487,7 +487,7 @@ class MusicalCow(Frame):
     def OnAddLyrics(self, event=None):
         dlg = ProgressDialog(self, title=_("Add lyrics into audio file"),
                            message=_("Add lyrics to the %d files") % self.mTags,
-                           maximum=self.mTags, abort=1)
+                           maximum=2*self.mTags, abort=1)
         dlg.Show()
         cancel = True
         added = 0
@@ -501,33 +501,34 @@ class MusicalCow(Frame):
             lyrics = {}
             songSelected = {}
             text = ""
-            print "0"
+            
             audio = ID3(file)
             artist = unicode(audio.getall('TPE1')[0])
             song = unicode(audio.getall('TIT2')[0])
-            print "2"
+            print "Debug: Load metadata"
             cancel = dlg.Update(added, _("Adding lyrics to %s - %s") %
-                                   (artist, song))
+                                (artist, song))
             
-            print "1"
+            print "Debug: showing progress bar"
             search = SearchLyrics()
-            print "2"
             result = search.SearchLyrics(artist, song)
             
-            print "yep"
+            print "Debug: Search lyrics"
             
             if result.has_key('error'):
                 self.output.InsertText(0, _("ERROR: ") % result['error'])
                 continue
-            print "co"
+            print "Debug: No error key on searching"
             
             # How many results ?
             if len(result['songlist'].values()) == 0:
                 self.output.InsertText(0, _("No result for %s - %s\r") %
                                           (artist, song))
+                print "Debug: len greater than 0"
                 continue
             elif len(result['songlist'].values()) == 1:
                 songSelected = result['songlist'][0]
+                print "Debug: 1 result"
             else:
                 choices = []
                 
@@ -544,7 +545,7 @@ class MusicalCow(Frame):
                     self.output.InsertText(0, _("No result for %s - %s\r") %
                                           (artist, song))
                     continue
-                
+                print "Debug: Choice"
                 choiceDialog.Destroy()
             print "enc"
             # Download lyrics

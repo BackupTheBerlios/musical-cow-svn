@@ -85,7 +85,7 @@ setup(
     description = 'Display lyrics and add lyrics to audio file',
     license = 'GNU GPL v2',
     options = {'py2exe': {
-                        'compressed': 1,
+                        #'compressed': 1,
                         'optimize': 2,
                         'bundle_files': 1,
                         'packages': ['encodings'],
@@ -94,6 +94,6 @@ setup(
     data_files = [
                   ('.', ['COPYING' , 'AUTHORS', 'TODO', 'musicalcow.cfg',
                    'python_transparent.ico']),
-                  ('locales/fr_FR/LC_MESSAGES', ["g:\\Python\\svnroot\\repos\\musical-cow\\locales\\fr_FR\\LC_MESSAGES\\musicalcow.mo"])
+                  ('locales/fr_FR/LC_MESSAGES', ["e:\\Python\\svnroot\\repos\\musical-cow\\locales\\fr_FR\\LC_MESSAGES\\musicalcow.mo"])
                  ],
     windows = [lyricscow])
